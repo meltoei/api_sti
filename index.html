@@ -1,0 +1,106 @@
+<html>
+
+<head>
+  <title>Config Push Message Line</title>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap-theme.min.css">
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/js/bootstrap.min.js"></script>
+  <!-- <link href="css/bootstrap-datetimepicker.css" rel="stylesheet">
+  <script src="js/bootstrap-datetimepicker.min.js"></script> -->
+
+
+</head>
+
+<body>
+  <div class="container">
+    <div style="margin:80px;">
+      <h2>New Config Push Message Line</h2>
+      <div class="jumbotron" style="padding:40px;">
+        <form method="GET" action="/save">
+
+          <div class="form-group">
+            <label for="msDate">Date : </label>
+            <input type="datetime-local" class="form-control" id="msDate" name="msDate" >
+          </div>
+          <div class="form-group">
+            <label for="msMessage"> Message : </label>
+            <textarea id="msMessage" name="msMessage" rows="4" cols="50" class="form-control" required></textarea>
+            <!-- <input type="text" class="form-control" id="msMessage" name="msMessage"> -->
+          </div>
+          <!-- <button onclick="myFunction()">Click me</button> -->
+          <button type="submit" class="btn btn-default">SAVE</button>
+          <a href="/"><button type="button" class="btn btn-default" >Back</button></a>
+        </form>
+
+      </div>
+    </div>
+  </div>
+</body>
+
+</html>
+<script>
+  // const server = require('server.js');
+
+  var today = toISOLocal(new Date()).substring(0,16);
+  //var today = new Date(Date.now() + ( 3600 * 1000 * 24)).toISOString().substring(0,16);
+  //var n = new Date(Date.now()).toLocaleString({timeZone: 'Asia/Bangkok'});
+  
+ // alert(today);
+  document.getElementById("msDate").min = today;
+  document.getElementById("msDate").value = today;
+  function toISOLocal(d) {
+  var z  = n =>  ('0' + n).slice(-2);
+  var zz = n => ('00' + n).slice(-3);
+  var off = d.getTimezoneOffset();
+  var sign = off < 0? '+' : '-';
+  off = Math.abs(off);
+
+  return d.getFullYear() + '-'
+         + z(d.getMonth()+1) + '-' +
+         z(d.getDate()) + 'T' +
+         z(d.getHours()) + ':'  + 
+         z(d.getMinutes()+1) + ':' +
+         z(d.getSeconds()) + '.' +
+         zz(d.getMilliseconds()) +
+         sign + z(off/60|0) + ':' + z(off%60); 
+}
+
+
+
+  function myFunction() {
+    var datetime = document.getElementById("msDate").value;
+
+
+    const folderName = './test'
+
+    // try {
+    //   if (!fs.existsSync(folderName)) {
+    //     fs.mkdirSync(folderName)
+    //   }
+    // } catch (err) {
+    //   console.error(err)
+    // }
+
+    // const content = datetime
+
+    // fs.writeFile('./test/test.txt', content, err => {
+    //   if (err) {
+    //     console.error(err)
+    //     return
+    //   }
+    //   //file written successfully
+    //   alert("successfully");
+    //   console.log("file written successfully");
+    // });
+
+    // fs.readFile('./test/test.txt', 'utf8', (err, data) => {
+    //   if (err) {
+    //     console.error(err)
+    //     return
+    //   }
+    //   console.log(data)
+    // });
+
+  }
+</script>
