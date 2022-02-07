@@ -3,7 +3,7 @@
 var app = require('express')();
 var mysql = require('mysql');
 const config = require('./db/config');
-const { alluser, login, createuser,userlistByChannel,userDetailById } = require('./service/user');
+//const { alluser, login, createuser,userlistByChannel,userDetailById } = require('./service/user');
 var bodyParser = require('body-parser');
 const request = require('request');
 const cheerio = require('cheerio')
@@ -78,21 +78,22 @@ app.all('*', function(req, res,next) {
 
 });
 
-app.get("/", (req, res) => {
+app.get("/loginform", (req, res) => {
     tk = ""
     res.sendFile(path.join(__dirname + '/login.html'));
+  
 });
 
 ///////////////ตัวอย่างการเรียกจากโปรเจคทอง ของสนามวัวยังไม่มี table เก็บ user ////////////////
-app.get('/user', function (req, res) {
-    console.log(req.body);
-    alluser.then(function (data) {
-        res.json({ 'message': 'ok','result':'00', 'payload': data });
-        // response.render('index', {data: data});
-    });
+// app.get('/user', function (req, res) {
+//     console.log(req.body);
+//     alluser.then(function (data) {
+//         res.json({ 'message': 'ok','result':'00', 'payload': data });
+//         // response.render('index', {data: data});
+//     });
 
 
-});
+// });
 
 // app.post('/login', function (req, res) {
 
@@ -154,7 +155,7 @@ app.get('/user', function (req, res) {
 // });
 
 
-app.get('/index', function (req, res) {
+app.get('/', function (req, res) {
 
     res.send('<h1>This is index page</h1>');
 
