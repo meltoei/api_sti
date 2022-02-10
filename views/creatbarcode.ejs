@@ -1,0 +1,373 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML>
+
+<HEAD>
+  <TITLE> New Document </TITLE>
+  <META NAME="Generator" CONTENT="EditPlus">
+  <META NAME="Author" CONTENT="">
+  <META NAME="Keywords" CONTENT="">
+  <META NAME="Description" CONTENT="">
+  <!-- <link rel="stylesheet" href="../css/style.css"> -->
+  <script src="../js/jquery-3.1.1.js"></script>
+  <script src="../js/jquery.form.min.js"></script>
+  <!-- <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>-->
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap-theme.min.css">
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/js/bootstrap.min.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"> 
+  <style>
+    @import url('https://fonts.googleapis.com/css?family=Poppins:400,500,600,700&display=swap');
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Poppins', sans-serif;
+    }
+
+    html,
+    body {
+      display: grid;
+      height: 100%;
+      /*  place-items: center;
+        background: #7099f9;*/
+      place-items: center;
+    }
+
+    .wrapper {
+      position: relative;
+      height: 55px;
+      /* width: 320px; */
+      width: 50%;
+      border-radius: 5px;
+      /* box-shadow: 0px 3px 3px rgba(0, 0, 0, 0.1); */
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .wrapper input {
+      width: 100%;
+      height: 100%;
+      border: 1px solid #7099f9;
+      padding-left: 15px;
+      font-size: 18px;
+      outline: none;
+      border-radius: 5px;
+    }
+
+    .wrapper input::placeholder {
+      font-size: 17px;
+    }
+
+    .wrapper span {
+      position: absolute;
+      right: 15px;
+      top: 30%;
+      transform: translateY(-50%);
+      font-size: 20px;
+      color: #7099f9;
+      cursor: pointer;
+      /*display: none;*/
+    }
+
+    .wrapper input:valid~span {
+      display: block;
+    }
+
+    .wrapper span i.hide-btn::before {
+      content: "\f070";
+    }
+
+    .file {
+      visibility: hidden;
+      position: absolute;
+    }
+    .bg{
+    background-image: url("../img/bg.jpg");
+    background-repeat: no-repeat;
+    background-size: cover;
+    width: 643px;
+    height: 264px;
+    margin: 2px;
+}
+
+.barcode2{
+    margin-top: 53mm;
+    margin-left: 56.5mm;
+}
+
+.barcode{
+  position: absolute;
+  margin-top: 53mm;
+  margin-left: 15mm;
+}
+/* 64ac15 */
+*,
+*:before,
+*:after {
+  box-sizing: border-box;
+}
+  </style>
+</HEAD>
+
+<BODY>
+  <!-- <div class="bg"></div> -->
+  <!-- <img src="../img/bg1.jpg"   alt="star" width="2550px" height="1050px"> -->
+  <!-- <button type="button" class="btn btn-success" onclick="genbarcode()">สร้างบาร์โค้ด</button> -->
+  <!-- <div id="demo" ></div> -->
+  <!-- <img src="http://localhost:8080/0101000110001111"   alt="star" width="260" height="160">
+
+<img src="http://localhost:8080/010100011000"   alt="star" width="260" height="160">
+
+<img src="http://localhost:8080/010100011000"   alt="star" width="260" height="160">
+
+<img src="http://localhost:8080/010100011000"   alt="star" width="260" height="160"> -->
+  <script>
+    $(document).ready(function () {
+      var bgname = '<%= bgname %>';
+      localStorage.setItem("bgname", bgname);
+      console.log("bgname")
+      console.log(bgname)
+
+      $('#frmUploader').attr('action', 'api/Upload/' + bgname);
+      // alert(bgname);
+      if (bgname == "") {
+        alert("เลือกรูปบัตร");
+        //document.getElementById("btnSubmit").style("display":n);
+        return;
+      }
+      var options = {
+        beforeSubmit: showRequest, // pre-submit callback 
+        success: showResponse // post-submit callback 
+      }; // bind to the form's submit event 
+      $('#frmUploader').submit(function () {
+        alert("sdss")
+        $(this).ajaxSubmit(options); // always return false to prevent standard browser submit and page navigation 
+        return false;
+      });
+    }); // pre-submit callback 
+    function showRequest(formData, jqForm, options) { 
+      //alert('Uploading is starting.'); 
+    return true; 
+  } // post-submit callback 
+    function showResponse(responseText, statusText, xhr, $form) {
+      //alert('status: ' + statusText + '\n\nresponseText: \n' + responseText);
+      var bg = localStorage.getItem("bgname");
+      genbarcode(bg);
+      //changeimg();
+    }
+
+
+
+
+    // var x ="", i;
+    // for (i=1; i<=10; i++) {
+    //   x = x + '<div class="bg" ><img src="http://localhost:8080/barcode/0101000'+i+'1000" width="112" height="55" class="barcode" ><img src="http://localhost:8080/barcode/0101000'+i+'1000" width="112" height="55" class="barcode2" ></div>';
+    // }
+    // document.getElementById("demo").innerHTML = x;
+    function changeimg(input) {
+
+      if (input.files && input.files[0]) {
+        var reader = new FileReader();
+        reader.onload = function (event) {
+          //alert(event.target.result)
+          // $('#myid').attr('src', event.target.result);
+
+          var bg = "background-image: url('" + event.target.result + "');";
+          var x = "", i;
+          for (i = 1; i <= 1; i++) {
+            x = x + '<div class="container" style="float: left;padding: 0em 0em 0em 0em;" ><div class="bg" style="' + bg + '"><img src="http://localhost:7780/barcode/010100001000" width="112" height="55" class="barcode" ><img src="http://localhost:7780/barcode/010100001000" width="112" height="55" class="barcode2" ></div> </div> ';
+          }
+          document.getElementById("demobg").innerHTML = x;
+        }
+        reader.readAsDataURL(input.files[0]);
+      }
+
+
+    }
+    function genbarcode(bg) {
+      localStorage.removeItem("bgname")
+      if (bg == "") {
+        alert("เลือกรูปบัตร");
+        //document.getElementById("btnSubmit").style("display":n);
+        return;
+      }
+      var data = {
+        test: "test",
+        bg: bg,
+        qty: document.getElementById("qty").value,
+        around: document.getElementById("around").value,
+        card_type: document.getElementById("card_type").value
+      }
+      var param = JSON.stringify(data);
+      window.location.href = "/genbarcode/" + param;
+    }
+    $(document).on("click", ".browse", function () {
+      var file = $(this).parents().find(".file");
+      file.trigger("click");
+    });
+  </script>
+
+
+  <div class="container">
+    <div class="row">
+      
+      <div class="form-group">
+        <select class="form-control form-select form-select-lg mb-3" name="around" id="around">
+          <option selected>รอบแข่ง</option>
+          <option value="01">เช้า</option>
+           <option value="02"> บ่าย</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <select class="form-control form-select form-select-lg mb-3" name="card_type" id="card_type">
+          <option selected>ประเภทตั๋ว</option>
+          <option value="01">ธรรมดา</option>
+          <option value="02">วีไอพี</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="sr-only" for="qty">จำนวน</label>
+        <input type="number" name="qty" class="form-control" id="qty" placeholder="จำนวน" autocomplete="off">
+      </div>
+
+      <!-- <div class="form-group input-group input-group-icon">
+        <select class="form-control form-select form-select-lg mb-3" name="around" id="around" >
+          <option value="00"> รอบแข่ง</option>
+          <option value="01">เช้า</option>
+           <option value="02"> บ่าย</option>
+        
+        </select>
+      <input type="text" placeholder="ประเภทบัตร" />
+        <div class="input-icon"><i class="fa fa-user"></i></div> -->
+      <!-- </div>  -->
+      <!-- <div class="input-group input-group-icon">
+       <input type="email" placeholder="ประเภทตั๋ว" /> 
+       
+        <select name="card_type" id="card_type" >
+          <option value="00">ประเภทตั๋ว</option>
+          <option value="01">วีไอพี</option>
+           <option value="02">ธรรมดา</option>
+          <option value="03">ฟรี</option>
+        </select>
+       
+     <label>ประเภทตั๋ว</label> -->
+      <!-- <div class="input-icon"><i class="fa fa-envelope"></i></div> -->
+      <!-- </div>  -->
+
+      <!-- <div class="input-group input-group-icon">
+        <input type="number" placeholder="จำนวน" name="qty" id="qty" style="width: 50%;" /> 
+    <div class="input-icon"><i class="fa fa-key"></i></div> 
+      </div> -->
+      <div class="form-group input-group mb-3">
+        <button type="button" class="browse btn btn-primary">เลือกรูปบัตร</button>
+        <div class="input-group-append" style="float: left;">
+  
+          <input type="text" class="form-control" disabled placeholder="Upload File" id="file">
+  
+        </div>
+      </div>
+      <form id="frmUploader" enctype="multipart/form-data" method="post" onsubmit="changeimg(this)">
+        <input class="button btn-lg btn-dark file" type="file" name="imgUploader" onchange="changeimg(this)" multiple />
+        <input class="btn btn-success " type="submit" name="submit" id="btnSubmit" value="Upload" />
+      </form>
+     
+    </div>
+
+
+
+
+
+
+
+  
+
+
+
+    <form>
+      <div class="row">
+        <div id="demobg"></div>
+        <!-- <h4>Account</h4>
+        <div class="input-group input-group-icon">
+          <input type="text" placeholder="Full Name" />
+          <div class="input-icon"><i class="fa fa-user"></i></div>
+        </div>
+        <div class="input-group input-group-icon">
+          <input type="email" placeholder="Email Adress" />
+          <div class="input-icon"><i class="fa fa-envelope"></i></div>
+        </div>
+        <div class="input-group input-group-icon">
+          <input type="password" placeholder="Password" />
+          <div class="input-icon"><i class="fa fa-key"></i></div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-half">
+          <h4>Date of Birth</h4>
+          <div class="input-group">
+            <div class="col-third">
+              <input type="text" placeholder="DD" />
+            </div>
+            <div class="col-third">
+              <input type="text" placeholder="MM" />
+            </div>
+            <div class="col-third">
+              <input type="text" placeholder="YYYY" />
+            </div>
+          </div>
+        </div>
+        <div class="col-half">
+          <h4>Gender</h4>
+          <div class="input-group">
+            <input id="gender-male" type="radio" name="gender" value="male" />
+            <label for="gender-male">Male</label>
+            <input id="gender-female" type="radio" name="gender" value="female" />
+            <label for="gender-female">Female</label>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <h4>Payment Details</h4>
+        <div class="input-group">
+          <input id="payment-method-card" type="radio" name="payment-method" value="card" checked="true" />
+          <label for="payment-method-card"><span><i class="fa fa-cc-visa"></i>Credit Card</span></label>
+          <input id="payment-method-paypal" type="radio" name="payment-method" value="paypal" />
+          <label for="payment-method-paypal"> <span><i class="fa fa-cc-paypal"></i>Paypal</span></label>
+        </div>
+        <div class="input-group input-group-icon">
+          <input type="text" placeholder="Card Number" />
+          <div class="input-icon"><i class="fa fa-credit-card"></i></div>
+        </div>
+        <div class="col-half">
+          <div class="input-group input-group-icon">
+            <input type="text" placeholder="Card CVC" />
+            <div class="input-icon"><i class="fa fa-user"></i></div>
+          </div>
+        </div>
+        <div class="col-half">
+          <div class="input-group">
+            <select>
+              <option>01 Jan</option>
+              <option>02 Jan</option>
+            </select>
+            <select>
+              <option>2015</option>
+              <option>2016</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <h4>Terms and Conditions</h4>
+        <div class="input-group">
+          <input id="terms" type="checkbox" />
+          <label for="terms">I accept the terms and conditions for signing up to this service, and hereby confirm I have
+            read the privacy policy.</label>
+        </div>-->
+      </div>
+    </form>
+  </div>
+  <!-- <button onclick="genbarcode(this)">สร้างบาร์โค้ด</button> -->
+</BODY>
+
+</HTML>
