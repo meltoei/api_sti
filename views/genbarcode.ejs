@@ -2,7 +2,7 @@
 <HTML>
 
 <HEAD>
-  <TITLE> New Document </TITLE>
+  <TITLE> สนามกีฬาชนโค ทุ่งทะเลหลวงสุโขทัย </TITLE>
   <META NAME="Generator" CONTENT="EditPlus">
   <META NAME="Author" CONTENT="">
   <META NAME="Keywords" CONTENT="">
@@ -14,7 +14,7 @@
 <BODY style="background-color: #ffffff;">
   <header>
     <h1><a href="/creatbarcode">
-        << ปริ้นบาร์โค้ดเพิ่ม</a>
+        << กลับหน้าใส่ข้อมูลปริ้นบัตร</a>
     </h1>
   </header>
 
@@ -37,14 +37,15 @@
 
     var bg = "background-image: url('../img/" + '<%= data.bg %>' + "_bg.jpg');";
     var x = "", i;
-    var n = parseInt('<%= data.qty %>');
+    var n = parseInt('<%= data.qtyend %>');
+    var start = parseInt('<%= data.qtystart %>');
     var a = '<%= data.around %>';
     var c = '<%= data.card_type %>';
     var price = "";
     var barcode= "";
     var ticketnum= "";
-    // alert(n)
-    for (i = 1; i <= n; i++) {
+ 
+    for (i = start; i <= n; i++) {
       if (a == "02") {
         price = "0000"
       }
@@ -61,7 +62,7 @@
         ticketnum = "" + i;
       }
         barcode = a + "" + c + "" + ticketnum + price;
-        x = x + '<div class="container" style="float: left;padding: 0em 0em 0em 0em;" ><div class="bg" style="' + bg + '"><img src="http://202.129.16.74:7780/barcode/' + barcode + '" width="100" height="40" class="barcode" ><img src="http://202.129.16.74:7780/barcode/' + barcode + '" width="110" height="50" class="barcode2" ></div> </div> ';
+        x = x + '<div class="container" style="float: left;padding: 0em 0em 0em 0em;" ><div class="bg" style="' + bg + '"><div class="ticketnum1">'+ticketnum+'</div><img src="http://202.129.16.74:7780/barcode/' + barcode + '" width="103" height="44" class="barcode3" ><img src="http://202.129.16.74:7780/barcode/' + barcode + '" width="120" height="52" class="barcode4" ><div class="ticketnum2">'+ticketnum+'</div></div> </div> ';
     }
       document.getElementById("demo").innerHTML = x;
       function genbarcode() {
@@ -72,7 +73,7 @@
         window.location.href = "/genbarcode/" + param;
       }
   </script>
-  // <!-- <button onclick="genbarcode()">สร้างบาร์โค้ด</button> -->
+   <!-- <button onclick="genbarcode()">สร้างบาร์โค้ด</button> -->
 
 </BODY>
 

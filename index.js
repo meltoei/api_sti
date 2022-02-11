@@ -25,7 +25,7 @@ app.use(bodyParser.json())
 
 /* ใช้ port 7777 หรือจะส่งเข้ามาตอนรัน app ก็ได้ */
 
-var port = process.env.PORT || 8000;
+var port = process.env.PORT || 7778;
 const url = 'https://xn--42cah7d0cxcvbbb9x.com/'
 
 
