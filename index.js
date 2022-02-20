@@ -3,10 +3,14 @@
 var app = require('express')();
 var mysql = require('mysql');
 const config = require('./db/config');
-//const { alluser, login, createuser,userlistByChannel,userDetailById } = require('./service/user');
 var bodyParser = require('body-parser');
 const request = require('request');
 const cheerio = require('cheerio')
+//const { alluser, login, createuser,userlistByChannel,userDetailById } = require('./service/user');
+const { createticket, updateticket, ticketDetailById,buyall } = require('./service/ticket');
+
+
+
 
 
 
@@ -48,7 +52,7 @@ app.use(function (req, res, next) {
     // Pass to next layer of middleware
     next();
 });
-app.all('*', function(req, res,next) {
+app.all('*', function (req, res, next) {
     /**
      * Response settings
      * @type {Object}
@@ -64,7 +68,7 @@ app.all('*', function(req, res,next) {
      * Headers
      */
     res.header("Access-Control-Allow-Credentials", responseSettings.AccessControlAllowCredentials);
-    res.header("Access-Control-Allow-Origin",  responseSettings.AccessControlAllowOrigin);
+    res.header("Access-Control-Allow-Origin", responseSettings.AccessControlAllowOrigin);
     res.header("Access-Control-Allow-Headers", (req.headers['access-control-request-headers']) ? req.headers['access-control-request-headers'] : "x-requested-with");
     res.header("Access-Control-Allow-Methods", (req.headers['access-control-request-method']) ? req.headers['access-control-request-method'] : responseSettings.AccessControlAllowMethods);
 
@@ -81,9 +85,102 @@ app.all('*', function(req, res,next) {
 app.get("/loginform", (req, res) => {
     tk = ""
     res.sendFile(path.join(__dirname + '/login.html'));
-  
+
 });
 
+app.post('/ticket/buy', function (req, res) {
+    console.log('req.bodylllllllllllllllllllllllllllllllllll');
+    // let reqbody = {
+    //     ticket_number : ["010100010700"],
+    //     code_buy : "0001",
+    //     code_scan_door : "0002"
+
+    // };
+
+    let reqbody = req.body;
+    const hrtime = process.hrtime();
+    let milliSeconds = parseInt(((hrtime[0] * 1e3) + (hrtime[1]) * 1e-6));
+    console.log('milliSeconds: ' + milliSeconds);
+    var todayDate = new Date().toISOString().slice(0, 10);
+    console.log(todayDate);
+
+    reqbody.ticket_number.forEach(ticketNumber => {
+        let ticketAround = ticketNumber.substring(0, 2);
+        let ticketType = ticketNumber.substring(2, 4);
+        let ticketTransaction = 'SFB' + milliSeconds;
+        let ticketPrice = 0;
+        if (ticketNumber.substring(8) != '0000') {
+            ticketPrice = ticketNumber.substring(8);
+        }
+
+        let dataBuy = {
+            ticket_number: ticketNumber,
+            ticket_transaction: ticketTransaction,
+            ticket_around: ticketAround,
+            ticket_type: ticketType,
+            ticket_price: ticketPrice,
+            ticket_expire: '0',
+            status: '0',
+            stage: '1',
+            code_buy: reqbody.code_buy,
+            code_scan_door: reqbody.code_scan_door,
+            date_match: todayDate
+        };
+
+        createticket(dataBuy).then(function () {
+            console.log("ok........");
+            res.json({ 'message': 'ok', 'result': '00' });
+        
+       
+            //response.render('index', {data: data});
+        });
+
+        console.log(dataBuy);
+    });
+    console.log(req.body);
+});
+
+
+
+app.get('/ticket/scan/:id', function (req, res) {
+
+    let id = req.params.id;
+    let status = "";
+    let stage = "";
+
+    ticketDetailById(id, status, stage).then(function (data) {
+
+        if (data == "") {
+            res.json({ 'message': 'ไม่พบข้อมูลในระบบ', 'result': '01', 'payload': data });
+        } else {
+
+            status = "0";
+            stage = 1;
+
+            ticketDetailById(id, status, stage).then(function (data1) {
+
+                if (data1 == "") {
+                    res.json({ 'message': 'บัตรนี้ถูกใช้งานไปแล้ว', 'result': '02', 'payload': data1 });
+                } else {
+
+                    updateticket(2, id).then(function (data2) {
+                        //res.json({ 'message': 'ok','result':'00' });
+                        if (data1 == "") {
+                            res.json({ 'message': 'ไม่สำเร็จ', 'result': '03', 'payload': '' });
+                        } else {
+                            res.json({ 'message': 'ok', 'result': '00', 'payload': data2 });
+                        }
+                    });
+                }
+            });
+        }
+
+        //console.log(data);
+        //console.log(data[0].code);
+        // response.render('index', {data: data});
+    });
+
+});
 ///////////////ตัวอย่างการเรียกจากโปรเจคทอง ของสนามวัวยังไม่มี table เก็บ user ////////////////
 // app.get('/user', function (req, res) {
 //     console.log(req.body);
@@ -124,7 +221,7 @@ app.get("/loginform", (req, res) => {
 
 // app.post('/user/store', function (req, res) {
 //     console.log(req.body);
-    
+
 //     createuser(req.body).then(function (data) {
 //         res.json({ 'message': 'ok','result':'00', 'listdata': data });
 //         // response.render('index', {data: data});
@@ -134,7 +231,7 @@ app.get("/loginform", (req, res) => {
 
 // app.post('/user/channel', function (req, res) {
 //     console.log(req.body.channel);
-    
+
 //     userlistByChannel(req.body.channel).then(function (data) {
 //         //res.json({ 'message': 'ok','result':'00', 'listdata': data });
 //         res.json({ 'message': 'ok','result':'00', 'payload': data });
@@ -145,7 +242,7 @@ app.get("/loginform", (req, res) => {
 
 // app.get('/user/:id/show', function (req, res) {
 //     console.log('user id ' + req.params.id);
-    
+
 //     userDetailById(req.params.id).then(function (data) {
 //         //res.json({ 'message': 'ok','result':'00', 'listdata': data });
 //         res.json({ 'message': 'ok','result':'00', 'payload': data });
@@ -154,60 +251,66 @@ app.get("/loginform", (req, res) => {
 
 // });
 
-
-app.get('/', function (req, res) {
-
-    res.send('<h1>This is index page</h1>');
-
+app.get('/ticket/buyall', function (req, res) {
+   
+    buyall().then(function (data) {
+        res.json(data);
+        // response.render('index', {data: data});
+    });
 });
+    app.get('/', function (req, res) {
+
+        res.send('<h1>This is index page</h1>');
+
+    });
 
 
 
-app.get('/latest', (req, res) => {
-    request(url, (error, response, html) => {
-        if (!error && response.statusCode === 200) {
-            const $ = cheerio.load(html)
-            date = $('#rightCol > div.divgta.goldshopf > table > tbody > tr:nth-child(5) > td.span.bg-span.txtd.al-r').text()
-            update_time = $('#rightCol > div.divgta.goldshopf > table > tbody > tr:nth-child(5) > td.em.bg-span.txtd.al-r').text()
-            gold_buy = $('#rightCol > div.divgta.goldshopf > table > tbody > tr:nth-child(3) > td:nth-child(3)').text()
-            gold_sell = $('#rightCol > div.divgta.goldshopf > table > tbody > tr:nth-child(3) > td:nth-child(2)').text()
-            goldBar_buy = $('#rightCol > div.divgta.goldshopf > table > tbody > tr:nth-child(2) > td:nth-child(3)').text()
-            goldBar_sell = $('#rightCol > div.divgta.goldshopf > table > tbody > tr:nth-child(2) > td:nth-child(2)').text()
-            res.json({
-                status: 'success',
-                response: {
-                    date: date,
-                    update_time: update_time,
-                    price: {
-                        gold: {
-                            buy: gold_buy,
-                            sell: gold_sell,
-                        },
-                        gold_bar: {
-                            buy: goldBar_buy,
-                            sell: goldBar_sell,
-                        },
+    app.get('/latest', (req, res) => {
+        request(url, (error, response, html) => {
+            if (!error && response.statusCode === 200) {
+                const $ = cheerio.load(html)
+                date = $('#rightCol > div.divgta.goldshopf > table > tbody > tr:nth-child(5) > td.span.bg-span.txtd.al-r').text()
+                update_time = $('#rightCol > div.divgta.goldshopf > table > tbody > tr:nth-child(5) > td.em.bg-span.txtd.al-r').text()
+                gold_buy = $('#rightCol > div.divgta.goldshopf > table > tbody > tr:nth-child(3) > td:nth-child(3)').text()
+                gold_sell = $('#rightCol > div.divgta.goldshopf > table > tbody > tr:nth-child(3) > td:nth-child(2)').text()
+                goldBar_buy = $('#rightCol > div.divgta.goldshopf > table > tbody > tr:nth-child(2) > td:nth-child(3)').text()
+                goldBar_sell = $('#rightCol > div.divgta.goldshopf > table > tbody > tr:nth-child(2) > td:nth-child(2)').text()
+                res.json({
+                    status: 'success',
+                    response: {
+                        date: date,
+                        update_time: update_time,
+                        price: {
+                            gold: {
+                                buy: gold_buy,
+                                sell: gold_sell,
+                            },
+                            gold_bar: {
+                                buy: goldBar_buy,
+                                sell: goldBar_sell,
+                            },
+                        }
                     }
-                }
-            },
-                200,
-            )
-        } else {
-            res.json({
-                status: 'failure',
-                response: 'Service is unavailable, Please try again later.',
-            },
-                404,
-            )
-        }
+                },
+                    200,
+                )
+            } else {
+                res.json({
+                    status: 'failure',
+                    response: 'Service is unavailable, Please try again later.',
+                },
+                    404,
+                )
+            }
+        })
     })
-})
 
 
-/* สั่งให้ server ทำการรัน Web Server ด้วย port ที่เรากำหนด */
+    /* สั่งให้ server ทำการรัน Web Server ด้วย port ที่เรากำหนด */
 
-app.listen(port, function () {
+    app.listen(port, function () {
 
-    console.log('Starting node.js on port ' + port);
+        console.log('Starting node.js on port ' + port);
 
-});
+    });

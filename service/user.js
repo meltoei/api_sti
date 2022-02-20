@@ -73,25 +73,12 @@ const userDetailById = function (id) {
 }
 
 
-
-// var login = new Promise(function(resolve, reject){
-//     config.db.connect(function(err) {
-//       if (err) throw err;
-//       config.db.query("SELECT * from admin", function (err, result, fields) {
-//         if (err) throw err;
-//           resolve(result);
-//       });
-//     });
-//     config.db.end()
-// });
-// exports.method = function() {};
-// exports.otherMethod = function() {};
 const login = function (user, pass) {
     console.log('test ............ ' + user);
     return new Promise(function (resolve, reject) {
         // config.db.connect(function(err) {
         //if (err) throw err;
-        var sql = 'SELECT * FROM admin WHERE username = ? and password = ?';
+        var sql = 'SELECT * FROM admin_list WHERE username = ? and password = ?';
         config.db.query(sql,[user,pass], function (err, result, fields) {
             if (err) throw err;
             resolve(result);
