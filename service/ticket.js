@@ -1,4 +1,4 @@
-var db = require('mysql');
+//var db = require('mysql');
 const config = require('../db/config');
 
 
@@ -27,8 +27,8 @@ const ticketDetailById = function (id, status, stage) {
 // };
 
 
-const buyall =  function () {
-    return new Promise( async function (resolve, reject) {
+const buyall = function () {
+    return new Promise(async function (resolve, reject) {
         // config.db.connect(function(err) {
         //if (err) throw err;
         //await  config.db.connect();
@@ -36,7 +36,7 @@ const buyall =  function () {
             if (err) throw err;
             resolve(result);
         });
-      //  await config.db.end();
+        //  await config.db.end();
 
         //});
 
@@ -44,16 +44,48 @@ const buyall =  function () {
     });
 }
 
-var buyall1 = new Promise(function (resolve, reject) {
-    // config.db.connect(function(err) {
-    //if (err) throw err;
-    config.db.query("SELECT * from sti_ticket_transaction", function (err, result) {
-        if (err) throw err;
-        resolve(result);
-    });
-    //});
+const countbuy = function () {
 
-});
+
+    return new Promise(function (resolve, reject) {
+        // config.db.connect(function(err) {
+        //if (err) throw err;
+        //await  config.db.connect();
+        config.db.query("SELECT COUNT(DISTINCT(ticket_number)) as ticketnum,ticket_around,DATE_FORMAT(date_match, '%Y%m%d') as date_match FROM sti_ticket_transaction GROUP BY ticket_around,date_match", function (err, result) {
+            console.log(result);
+            if (err) throw err;
+            resolve(result);
+            //config.db.end();
+        });
+        // await config.db.end();
+
+    });
+
+    // })
+
+    // return await config.db.query("SELECT COUNT(DISTINCT(ticket_number)) as ticketnum,ticket_around,DATE_FORMAT(date_match, '%Y%m%d') as date_match FROM sti_ticket_transaction GROUP BY ticket_around,date_match", []).then((results) => {
+
+    //     console.log(results);
+
+    // }).catch(function(err){
+
+    //     console.log("Error:" + String(err));
+
+    // });
+    //});
+}
+
+
+// var buyall1 = new Promise(function (resolve, reject) {
+//     // config.db.connect(function(err) {
+//     //if (err) throw err;
+//     config.db.query("SELECT * from sti_ticket_transaction", function (err, result) {
+//         if (err) throw err;
+//         resolve(result);
+//     });
+//     //});
+
+// });
 
 
 // const userlistByChannel = function (channel) {
@@ -140,17 +172,17 @@ const createticket = function (data) {
             data.code_scan_door,
             data.date_match
         ];
-       //  config.db.connect();
-         config.db.query(sql, [values], function (err, result) {
-            console.log(result);
+        //  config.db.connect();
+        config.db.query(sql, [values], function (err, result) {
+            console.log(err);
             if (err) throw err;
-            console.log("1 record inserted");
             resolve(result);
+            //  config.db.end();
         }
         );
 
-     //    config.db.end();
-       //  return;
+        //    config.db.end();
+        //  return;
         // }
         //   );
         // config.db.end();
@@ -175,5 +207,6 @@ module.exports = {
     createticket,
     updateticket,
     ticketDetailById,
-    buyall
+    buyall,
+    countbuy
 };

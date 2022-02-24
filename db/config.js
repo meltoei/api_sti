@@ -3,10 +3,14 @@ var mysql = require('mysql');
 
 var db = mysql.createConnection({
   host     : 'localhost',
-  user     : 'root',
-  password : 'Dduan@it3',
-  database : 'bullsdb',
-  port: 3306
+  user     : 'jittsmgf_myadmin',
+  password : 'my@dmin',
+  database : 'jittsmgf_bullsdb',
+  port: 3306,
+  waitForConnections: true,
+  connectionLimit: 100,
+  queueLimit: 0
+
 });
 
 
