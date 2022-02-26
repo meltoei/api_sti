@@ -6,7 +6,7 @@ const config = require('./db/config');
 var bodyParser = require('body-parser');
 const request = require('request');
 const cheerio = require('cheerio')
-//const { alluser, login, createuser,userlistByChannel,userDetailById } = require('./service/user');
+const { positionList,positionDetail,positionAdd,positionUpdate,positionDelete,positionCheckCode } = require('./service/user');
 const { createticket, updateticket, ticketDetailById, buyall, countbuy } = require('./service/ticket');
 
 
@@ -181,6 +181,92 @@ app.get('/ticket/scan/:id', function (req, res) {
     });
 
 });
+
+app.get('/user/positiondetail/:id', function (req, res) {
+
+    let userId = req.params.id;
+    let status = "0";
+    
+    if(userId == 0){
+        positionList(status).then(function (data1) {
+            if (data1 == "") {
+                res.json({ 'message': 'ไม่พบข้อมูลในระบบ', 'result': '01', 'payload': data1 });
+            } else {
+                res.json({ 'message': 'ok', 'result': '00', 'payload': data1 });
+            }
+        });
+        
+    }else{
+        positionDetail(userId).then(function (data2) {
+            if (data2 == "") {
+                res.json({ 'message': 'ไม่พบข้อมูลในระบบ', 'result': '01', 'payload': data2 });
+            } else {
+                res.json({ 'message': 'ok', 'result': '00', 'payload': data2 });
+            }
+        });
+    }
+});
+
+app.post('/user/positionadd', function (req, res) {
+    
+    let reqbody = req.body;
+    // let reqbody = {
+    //     position_code: "TO011",
+    //     position_name: "xxx",
+    //     position_status: "0",
+    //     userId: "11"
+    // }
+    positionCheckCode(reqbody.position_code).then(function (data) {
+
+        if (data == "") {
+            positionAdd(reqbody).then(function (data1) {
+                if (data1) {
+                    res.json({ 'message': 'ok', 'result': '00', 'payload': "" });
+                }
+            });
+        } else {
+            res.json({ 'message': 'มี position code แล้วในระบบ', 'result': '01', 'payload': data });
+        }
+    });
+});
+
+app.post('/user/positionupdate', function (req, res) {
+    
+    let reqbody = req.body;
+    // let reqbody = {
+    //     position_code: "TO010",
+    //     position_name: "xxx",
+    //     position_status: "0",
+    //     userId:1
+    // }
+    positionCheckCode(reqbody.position_code).then(function (data) {
+
+        if (data == "") {
+            positionUpdate(reqbody).then(function (data1) {
+                if (data1) {
+                    res.json({ 'message': 'ok', 'result': '00', 'payload': "" });
+                }
+            });
+        } else {
+            res.json({ 'message': 'มีแล้ position code แล้วในระบบ', 'result': '01', 'payload': data });
+        }
+    });
+});
+
+app.get('/user/positiondelete/:id', function (req, res) {
+
+    let userId = req.params.id;
+    
+    positionDelete(userId).then(function (data) {
+        if (data == "") {
+            res.json({ 'message': 'ไม่พบข้อมูลในระบบ', 'result': '01', 'payload': data });
+        } else {
+            res.json({ 'message': 'ok', 'result': '00', 'payload': "" });
+        }
+    });
+});
+
+
 ///////////////ตัวอย่างการเรียกจากโปรเจคทอง ของสนามวัวยังไม่มี table เก็บ user ////////////////
 // app.get('/user', function (req, res) {
 //     console.log(req.body);
