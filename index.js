@@ -7,7 +7,7 @@ var bodyParser = require('body-parser');
 const request = require('request');
 const cheerio = require('cheerio')
 const { positionList,positionDetail,positionAdd,positionUpdate,positionDelete,positionCheckCode } = require('./service/user');
-const { createticket, updateticket, ticketDetailById, buyall, countbuy } = require('./service/ticket');
+const { createticket, updateticket, ticketDetailById, buyall, countbuy, checkTicketNumber } = require('./service/ticket');
 
 
 
@@ -89,9 +89,9 @@ app.get("/loginform", (req, res) => {
 });
 
 app.post('/ticket/buy', function (req, res) {
-    console.log('req.bodylllllllllllllllllllllllllllllllllll');
+    // console.log('req.bodylllllllllllllllllllllllllllllllllll');
     // let reqbody = {
-    //     ticket_number : ["010100010700"],
+    //     ticket_number : ["010100020800"],
     //     code_buy : "0001",
     //     code_scan_door : "0002"
 
@@ -102,42 +102,63 @@ app.post('/ticket/buy', function (req, res) {
     let milliSeconds = parseInt(((hrtime[0] * 1e3) + (hrtime[1]) * 1e-6));
     console.log('milliSeconds: ' + milliSeconds);
     var todayDate = new Date().toISOString().slice(0, 10);
-    console.log(todayDate);
-
+    
+    var ticket_numberDup = [];
+    let n = 1
     reqbody.ticket_number.forEach(ticketNumber => {
-        let ticketAround = ticketNumber.substring(0, 2);
-        let ticketType = ticketNumber.substring(2, 4);
-        let ticketTransaction = 'SFB' + milliSeconds;
-        let ticketPrice = 0;
-        if (ticketNumber.substring(8) != '0000') {
-            ticketPrice = ticketNumber.substring(8);
-        }
+        checkTicketNumber(ticketNumber).then(function (dataN) {
+         
+            if(dataN != ""){
+                ticket_numberDup.push(ticketNumber);
+            }
+        
+            if(n == reqbody.ticket_number.length){
+              if(ticket_numberDup == ""){
+                let ticketAround = ticketNumber.substring(0, 2);
+                let ticketType = ticketNumber.substring(2, 4);
+                let ticketTransaction = 'SFB' + milliSeconds;
+                let ticketPrice = 0;
+                if (ticketNumber.substring(8) != '0000') {
+                    ticketPrice = ticketNumber.substring(8);
+                }
 
-        let dataBuy = {
-            ticket_number: ticketNumber,
-            ticket_transaction: ticketTransaction,
-            ticket_around: ticketAround,
-            ticket_type: ticketType,
-            ticket_price: ticketPrice,
-            ticket_expire: '0',
-            status: '0',
-            stage: '1',
-            code_buy: reqbody.code_buy,
-            code_scan_door: reqbody.code_scan_door,
-            date_match: todayDate
-        };
+                let dataBuy = {
+                    ticket_number: ticketNumber,
+                    ticket_transaction: ticketTransaction,
+                    ticket_around: ticketAround,
+                    ticket_type: ticketType,
+                    ticket_price: ticketPrice,
+                    ticket_expire: '0',
+                    status: '0',
+                    stage: '1',
+                    code_buy: reqbody.code_buy,
+                    code_scan_door: reqbody.code_scan_door,
+                    date_match: todayDate
+                };
 
-        createticket(dataBuy).then(function () {
-            console.log("ok........");
-            res.json({ 'message': 'ok', 'result': '00' });
-
-
-            //response.render('index', {data: data});
+                createticket(dataBuy).then(function () {
+                    console.log("ok........");
+                    res.json({ 'message': 'ok', 'result': '00' });
+                });
+              }else{
+                //console.log(ticket_numberDup);
+                res.json({ 'message': 'บัตรนี้ถูกขายแล้ว', 'result': '02', 'payload': ticket_numberDup });
+              }
+            }
+            n++;        
         });
+       
 
-        console.log(dataBuy);
     });
-    console.log(req.body);
+
+    // reqbody.ticket_number.forEach(ticketNumber => {
+
+
+        
+
+    //     console.log(dataBuy);
+    // });
+    // console.log(req.body);
 });
 
 

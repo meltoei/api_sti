@@ -182,26 +182,17 @@ const createticket = async function (data) {
         data.code_scan_door,
         data.date_match
     ];
-    //  config.db.connect();
-    // config.db.query(sql, [values], function (err, result) {
-    //     console.log(err);
-    //     if (err) throw err;
-    //     resolve(result);
-    //     //  config.db.end();
-    // }
-    // );
-
-    //    config.db.end();
-    //  return;
-    // }
-    //   );
-    // config.db.end();
-    //  });
-
     const [rows, fields] = await db.promisePool.query(sql, [values]);
     console.log(rows);
     return rows;
 
+}
+
+const checkTicketNumber = async function (ticket_number) {
+    var sql = 'SELECT * FROM sti_ticket_transaction WHERE ticket_number = ?';
+
+    const [rows, fields] = await db.promisePool.query(sql, [ticket_number]);
+    return rows;
 }
 
 const updateticket = async function (stage, id) {
@@ -223,6 +214,7 @@ const updateticket = async function (stage, id) {
 
 module.exports = {
     createticket,
+    checkTicketNumber,
     updateticket,
     ticketDetailById,
     buyall,
